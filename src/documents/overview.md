@@ -21,7 +21,3 @@
 
 - Sequenced Collections
 - Stream Gatherers
-
-## Advanced (optional)
-
-- Foreign Function & Memory API
