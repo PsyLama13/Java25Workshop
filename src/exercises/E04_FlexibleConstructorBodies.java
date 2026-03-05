@@ -3,24 +3,24 @@ package exercises;
 import java.util.Objects;
 
 /**
- * Übung 8: Flexible Constructor Bodies
+ * Übung 4: Flexible Constructor Bodies
  *
  * Aufgabe: Refaktoriere die Konstruktoren, sodass Validierung und Transformation
- *          VOR dem super()-Aufruf stattfinden. Dies ist seit Java 22 (Preview) moeglich.
+ *          VOR dem super()-Aufruf stattfinden. Dies ist seit Java 22 (Preview) möglich.
  *
  * Hinweise:
- * - Statements duerfen jetzt vor super()/this() stehen
+ * - Statements dürfen jetzt vor super()/this() stehen
  * - Vor super() darf nicht auf "this" zugegriffen werden
  * - Instanzvariablen erst nach super() zuweisbar
- * - Kompilierung mit --enable-preview noetig
+ * - Kompilierung mit --enable-preview nötig
  */
-public class E08_FlexibleConstructorBodies {
+public class E04_FlexibleConstructorBodies {
 
     // ========================================================================
     // TODO 1: Refaktoriere den Konstruktor.
     //         Die Validierung soll VOR super() passieren.
-    //         Aktuell wird erst nach super() validiert - wenn super()
-    //         Seiteneffekte haette, waere das problematisch.
+    //         Aktuell wird erst nach super() validiert – wenn super()
+    //         Seiteneffekte hätte, wäre das problematisch.
     // ========================================================================
     static class Base {
         final String value;
@@ -43,8 +43,8 @@ public class E08_FlexibleConstructorBodies {
 
     // ========================================================================
     // TODO 2: Refaktoriere den Konstruktor.
-    //         Die Transformation (normalisierung) soll VOR super() passieren,
-    //         damit super() den normalisierten Wert erhaelt.
+    //         Die Transformation (Normalisierung) soll VOR super() passieren,
+    //         damit super() den normalisierten Wert erhält.
     //         Aktuell wird ein Workaround mit statischer Hilfsmethode verwendet.
     // ========================================================================
     static class NormalizedChild extends Base {
@@ -61,8 +61,8 @@ public class E08_FlexibleConstructorBodies {
 
     // ========================================================================
     // TODO 3: Refaktoriere den Konstruktor.
-    //         Die Berechnung des abgeleiteten Werts soll direkt im
-    //         Konstruktor passieren, nicht ueber eine Hilfsmethode.
+    //         Die Validierung soll direkt im Konstruktor stehen,
+    //         nicht in einer statischen Hilfsmethode.
     // ========================================================================
     static class Dimension {
         final int width;
@@ -76,9 +76,8 @@ public class E08_FlexibleConstructorBodies {
 
     static class ValidatedDimension extends Dimension {
         private static int validatePositive(int value, String name) {
-            if (value <= 0) {
+            if (value <= 0)
                 throw new IllegalArgumentException(name + " muss positiv sein, war: " + value);
-            }
             return value;
         }
 
@@ -90,7 +89,8 @@ public class E08_FlexibleConstructorBodies {
 
     // ========================================================================
     // TODO 4: Refaktoriere die this()-Delegation.
-    //         Berechne den vollen Namen VOR dem this()-Aufruf.
+    //         Die Berechnungen (fullName, id) sollen direkt vor this() stehen,
+    //         ohne statische Hilfsmethoden.
     // ========================================================================
     static class NamedEntity {
         final String fullName;
@@ -99,11 +99,6 @@ public class E08_FlexibleConstructorBodies {
         NamedEntity(String fullName, String id) {
             this.fullName = fullName;
             this.id = id;
-        }
-
-        NamedEntity(String firstName, String lastName, String id) {
-            // Transformation vor this()-Aufruf
-            this(firstName + " " + lastName, id);
         }
     }
 
@@ -128,7 +123,6 @@ public class E08_FlexibleConstructorBodies {
     // Testcode
     // ========================================================================
     public static void main(String[] args) {
-        // Test ValidatedChild
         System.out.println("=== ValidatedChild ===");
         var vc = new ValidatedChild("Hallo");
         System.out.println("Value: " + vc.value);
@@ -140,14 +134,12 @@ public class E08_FlexibleConstructorBodies {
 
         System.out.println();
 
-        // Test NormalizedChild
         System.out.println("=== NormalizedChild ===");
         var nc = new NormalizedChild("  HELLO World  ");
         System.out.println("Value: '" + nc.value + "'");
 
         System.out.println();
 
-        // Test ValidatedDimension
         System.out.println("=== ValidatedDimension ===");
         var vd = new ValidatedDimension(10, 20);
         System.out.println("Dimension: " + vd.width + "x" + vd.height);
@@ -159,10 +151,9 @@ public class E08_FlexibleConstructorBodies {
 
         System.out.println();
 
-        // Test Employee
         System.out.println("=== Employee ===");
         var emp = new Employee("Max", "Mustermann");
         System.out.println("Name: " + emp.fullName);
-        System.out.println("ID: " + emp.id);
+        System.out.println("ID:   " + emp.id);
     }
 }

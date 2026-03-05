@@ -1,6 +1,6 @@
-# Scoped Values
+# 6 · Scoped Values
 
-Scoped Values sind eine moderne Alternative zu `ThreadLocal`. Sie ermöglichen das Teilen von unveränderlichen Daten innerhalb eines Scopes ohne explizite Parameterübergabe.
+Scoped Values sind eine moderne Alternative zu `ThreadLocal`. Sie ermöglichen das Teilen unveränderlicher Daten innerhalb eines definierten Scopes – ohne explizite Parameterübergabe.
 
 ## Grundlagen
 
@@ -11,12 +11,12 @@ void handleRequest(Request request) {
     User user = authenticate(request);
 
     ScopedValue.where(CURRENT_USER, user).run(() -> {
-        processRequest();  // Kann auf CURRENT_USER zugreifen
+        processRequest();  // kann auf CURRENT_USER zugreifen
     });
 }
 
 void processRequest() {
-    User user = CURRENT_USER.get();  // Kein Parameter nötig!
+    User user = CURRENT_USER.get();  // kein Parameter nötig!
     // ...
 }
 ```
@@ -34,33 +34,35 @@ String result = ScopedValue.where(CURRENT_USER, user).call(() -> {
 | Eigenschaft | ThreadLocal | ScopedValue |
 |-------------|-------------|-------------|
 | Mutierbar | Ja | Nein (immutable) |
-| Vererbung | Manuell | Automatisch (Virtual Threads) |
-| Scope | Unbegrenzt | Explizit begrenzt |
-| Performance | Langsamer | Schneller |
+| Scope-Ende | Manuelles `remove()` | Automatisch |
 | Memory Leaks | Möglich | Nicht möglich |
+| Virtual Threads | Problematisch | Erstklassige Unterstützung |
+| Performance | Langsamer | Schneller |
 
-## Verschachtelte Scopes
+## Verschachtelte Scopes (Rebinding)
 
 ```java
 ScopedValue.where(USER, admin).run(() -> {
     // USER ist hier "admin"
+    USER.get();  // → admin
 
     ScopedValue.where(USER, guest).run(() -> {
-        // USER ist hier "guest" (rebind)
+        USER.get();  // → guest (rebind im inneren Scope)
     });
 
-    // USER ist wieder "admin"
+    USER.get();  // → wieder admin
 });
 ```
 
 ## Mit Structured Concurrency
 
+Scoped Values werden automatisch an Child-Threads weitergegeben:
+
 ```java
 ScopedValue.where(CURRENT_USER, user).run(() -> {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-        // Beide Tasks sehen CURRENT_USER automatisch
-        scope.fork(() -> taskThatNeedsUser());
-        scope.fork(() -> anotherTaskThatNeedsUser());
+        scope.fork(() -> taskA());  // sieht CURRENT_USER automatisch
+        scope.fork(() -> taskB());  // sieht CURRENT_USER automatisch
         scope.join();
     }
 });
