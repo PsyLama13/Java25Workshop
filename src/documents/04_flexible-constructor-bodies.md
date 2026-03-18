@@ -25,6 +25,7 @@ public class PositiveInteger {
     }
 }
 ```
+**Big Impact:** bei Klassen mit einem aufwändigen super Constructor 
 
 ## Praktisches Beispiel: Transformation vor super()
 
