@@ -136,7 +136,7 @@ double area(Shape s) {
     return switch (s) {
         case Circle c    -> Math.PI * c.radius() * c.radius();
         case Rectangle r -> r.w() * r.h();
-        // exhaustive – kein default nötig!
+        // exhaustive – kein default nötig, analog zu Enmus!
     };
 }
 ```
