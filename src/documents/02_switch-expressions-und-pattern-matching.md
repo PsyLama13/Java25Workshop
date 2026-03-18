@@ -38,7 +38,7 @@ String result = switch (day) {
 String result = switch (day) {
     case MONDAY -> {
         logger.log("Start of week");
-        yield "Working";
+        yield "Working"; //returns "Working"
     }
     default -> "Midweek";
 };
