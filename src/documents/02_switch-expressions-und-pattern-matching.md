@@ -123,6 +123,7 @@ String describe(Object obj) {
     };
 }
 ```
+**Hinweis:** die Reihenfolge im Code entscheidet über den Ablauf, nicht die logische Reihenfolge
 
 ### Mit Sealed Classes – kein `default` nötig
 
