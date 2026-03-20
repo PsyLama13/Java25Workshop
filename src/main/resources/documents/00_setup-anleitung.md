@@ -112,4 +112,5 @@ Die Tests werden am Anfang **fehlschlagen** – das ist gewollt! Die Übungen be
 Bei Fragen oder Problemen mit dem Setup meldet euch gerne vorab, damit wir am Workshop-Tag direkt loslegen können.
 
 Freundliche Grüsse
+
 Martin & Yannick
