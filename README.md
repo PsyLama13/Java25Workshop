@@ -1,8 +1,5 @@
 # Java 25 Workshop – Setup-Anleitung
 
-Hallo zusammen
-
-Am 27.03.2026 findet unser Java 25 Workshop statt. Damit wir direkt mit den Übungen starten können, bitten wir euch, die folgende Einrichtung **vorab** durchzuführen.
 
 ---
 
@@ -67,7 +64,7 @@ mvn --version
 
 ```bash
 git clone https://github.com/PsyLama13/Java25Workshop.git
-cd java25-workshop
+cd Java25Workshop
 mvn compile
 ```
 
