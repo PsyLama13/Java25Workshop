@@ -1,5 +1,7 @@
-package exercises.e07;
+package exercises.e00;
 
+import exercises.e07.SequencedCollectionsExercise;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,12 +20,12 @@ import static org.junit.jupiter.api.Assertions.*;
  *   Nutze map.firstEntry() / map.lastEntry().
  * - manipulateList(): Refaktoriere mit addFirst/addLast und removeFirst/removeLast.
  */
-@DisplayName("Übung 7.1: Sequenced Collections")
-class E7_1_SequencedCollectionsExerciseTest {
+@DisplayName("Übung 0.1: Sequenced Collections")
+class E0_1_SequencedCollectionsExerciseTest {
 
     @Test
     void erstesUndLetztesElement() {
-        assertEquals("Erstes: Alpha, Letztes: Delta",
+        Assertions.assertEquals("Erstes: Alpha, Letztes: Delta",
                 SequencedCollectionsExercise.getFirstAndLast(List.of("Alpha", "Beta", "Gamma", "Delta")));
     }
 

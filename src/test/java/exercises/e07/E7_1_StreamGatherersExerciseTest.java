@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * - Gatherers.scan(init, op) für kumulative Operationen
  * - Eigene Gatherer mit Gatherer.ofSequential(init, integrator)
  */
-@DisplayName("Übung 7.2: Stream Gatherers")
-class E7_2_StreamGatherersExerciseTest {
+@DisplayName("Übung 7.1: Stream Gatherers")
+class E7_1_StreamGatherersExerciseTest {
 
     @Test
     void partitioniertKorrekt() {

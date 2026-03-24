@@ -1,4 +1,4 @@
-package ch.irix.jdk25test.devmeeting.virtualthreads;
+package exercises.virtualthreads;
 
 import java.awt.*;
 

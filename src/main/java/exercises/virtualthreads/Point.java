@@ -1,4 +1,4 @@
-package ch.irix.jdk25test.devmeeting.virtualthreads;
+package exercises.virtualthreads;
 
 public record Point (double x, double y) {
 
