@@ -7,7 +7,7 @@ Flexible Constructor Bodies (Java 22+, Preview) erlauben Statements **vor** dem 
 ```java
 public class PositiveInteger {
     public PositiveInteger(int value) {
-        super();  // muss als erstes stehen – Validierung kommt zu spät!
+        super(value);  // muss als erstes stehen – Validierung kommt zu spät!
         if (value <= 0) throw new IllegalArgumentException("Must be positive");
         this.value = value;
     }
@@ -20,7 +20,7 @@ public class PositiveInteger {
 public class PositiveInteger {
     public PositiveInteger(int value) {
         if (value <= 0) throw new IllegalArgumentException("Must be positive");
-        super();  // kann jetzt nach der Validierung kommen
+        super(value);  // kann jetzt nach der Validierung kommen
         this.value = value;
     }
 }
