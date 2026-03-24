@@ -1,6 +1,6 @@
 # 0 · Vereinfachte Main-Methoden & IO
 
-## Vereinfachte Main-Methoden (JEP 477)
+## Vereinfachte Main-Methoden
 
 Seit Java 21 (Preview) bzw. Java 25 (Final) kann die `main`-Methode drastisch vereinfacht werden. Ziel: Der Einstieg in Java soll einfacher werden – weniger Boilerplate für einfache Programme.
 
@@ -63,7 +63,7 @@ void main() {
 
 ---
 
-## Vereinfachtes IO (JEP 495)
+## Vereinfachtes IO
 
 Mit Java 24 (Preview) bzw. Java 25 werden häufig gebrauchte IO-Methoden direkt in implizit deklarierten Klassen verfügbar – ohne `System.out` oder `Scanner`.
 
