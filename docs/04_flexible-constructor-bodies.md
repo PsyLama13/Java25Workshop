@@ -5,7 +5,7 @@ Flexible Constructor Bodies (Java 22+, Preview) erlauben Statements **vor** dem 
 ## Problem vorher
 
 ```java
-public class PositiveInteger {
+public class PositiveInteger extends CustomNumber{
 
     //non-default Constructor
     public PositiveInteger(int value) {
@@ -19,7 +19,7 @@ public class PositiveInteger {
 ## Lösung nachher
 
 ```java
-public class PositiveInteger {
+public class PositiveInteger extends CustomNumber{
     public PositiveInteger(int value) {
         if (value <= 0) throw new IllegalArgumentException("Must be positive");
         super(value);  // kann jetzt nach der Validierung kommen
