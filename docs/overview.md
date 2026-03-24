@@ -15,4 +15,4 @@
 
 ## Collections & Streams
 
-7. **Sequenced Collections & Stream Gatherers** – Einheitliche API für geordnete Collections und eigene Stream-Operationen YZ
+7. **Stream Gatherers** – eigene Stream-Operationen YZ

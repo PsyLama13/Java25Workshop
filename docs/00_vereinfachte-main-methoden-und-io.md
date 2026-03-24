@@ -139,3 +139,47 @@ void main() {
 ```
 
 Kein `public class`, kein `static`, kein `String[] args`, kein `System.out`, kein `Scanner` – einfach loslegen.
+
+---
+
+## Sequenced Collections
+
+Sequenced Collections fügen eine einheitliche API für Collections mit definierter Reihenfolge hinzu. Erstes/letztes Element und umgekehrte Iteration sind jetzt standardisiert.
+
+### Neue Interface-Hierarchie
+
+```
+SequencedCollection
+    ├── SequencedSet
+    └── (implementiert von List, Deque, LinkedHashSet, ...)
+SequencedMap
+    └── (implementiert von LinkedHashMap, ...)
+```
+
+### SequencedCollection – neue Methoden
+
+```java
+List<String> list = new ArrayList<>(List.of("a", "b", "c"));
+
+// Vorher                            Nachher
+list.get(0)                       // list.getFirst()
+list.get(list.size() - 1)         // list.getLast()
+list.add(0, "x")                  // list.addFirst("x")
+list.remove(list.size() - 1)      // list.removeLast()
+
+// Umgekehrte Iteration – reversed() ist eine View, keine Kopie!
+for (String s : list.reversed()) {
+    System.out.println(s);  // c, b, a
+}
+```
+
+### SequencedMap
+
+```java
+LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+map.put("eins", 1); map.put("zwei", 2); map.put("drei", 3);
+
+map.firstEntry()   // eins=1
+map.lastEntry()    // drei=3
+map.reversed()     // umgekehrte View
+```
