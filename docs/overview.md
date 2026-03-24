@@ -2,6 +2,7 @@
 
 ## Sprache & Typensystem
 
+0. **simplified main and IO** vereinfachterer Einstiegspunkt in sie Java Welt MF
 1. **Records & Sealed Classes** – Kompakte Datenklassen und geschlossene Typhierarchien YZ
 2. **Switch Expressions & Pattern Matching** – Von switch-Statements zu Type/Guarded Patterns MF
 3. **Record Patterns & Unnamed Variables** – Dekonstruktion von Records, `_` für unbenutzte Werte YZ
