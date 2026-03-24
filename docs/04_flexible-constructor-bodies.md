@@ -11,7 +11,6 @@ public class PositiveInteger extends CustomNumber{
     public PositiveInteger(int value) {
         super(value);  // muss als erstes stehen – Validierung kommt zu spät!
         if (value <= 0) throw new IllegalArgumentException("Must be positive");
-        this.value = value;
     }
 }
 ```
@@ -23,7 +22,6 @@ public class PositiveInteger extends CustomNumber{
     public PositiveInteger(int value) {
         if (value <= 0) throw new IllegalArgumentException("Must be positive");
         super(value);  // kann jetzt nach der Validierung kommen
-        this.value = value;
     }
 }
 ```
@@ -54,7 +52,6 @@ public class DatabaseConnection extends Connection {
         Objects.requireNonNull(url, "URL darf nicht null sein");
         String normalizedUrl = url.toLowerCase().trim();
         super(normalizedUrl);  // super() erhält den transformierten Wert
-        this.url = normalizedUrl;
     }
 }
 ```
