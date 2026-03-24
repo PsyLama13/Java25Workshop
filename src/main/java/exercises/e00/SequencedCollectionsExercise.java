@@ -1,4 +1,4 @@
-package exercises.e07;
+package exercises.e00;
 
 import java.util.*;
 

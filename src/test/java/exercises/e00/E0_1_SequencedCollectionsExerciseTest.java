@@ -1,6 +1,5 @@
 package exercises.e00;
 
-import exercises.e07.SequencedCollectionsExercise;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
