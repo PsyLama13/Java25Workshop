@@ -29,6 +29,7 @@ void main() {
 | `public class` erforderlich | Implizit deklarierte Klasse – keine Klassendeklaration nötig |
 | `public static void main(String[] args)` | `void main()` genügt |
 | `System.out.println(...)` | `println(...)` direkt verfügbar |
+| `package (...)` | braucht es nicht mehr |
 
 ### Regeln für vereinfachte Main-Methoden
 
