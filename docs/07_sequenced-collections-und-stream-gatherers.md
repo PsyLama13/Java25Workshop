@@ -282,3 +282,9 @@ Stream.of(10, 13, 17, 20, 28)
 | Short-Circuit möglich   | Ja (`return false`)                | Nein                              |
 | Stream läuft weiter     | Ja                                 | Nein                              |
 | Seit                    | Java 24                            | Java 8                            |
+
+---
+
+### Weiterführendes Material
+
+- [Stream Gatherers erklärt (YouTube)](https://www.youtube.com/watch?v=v_5SKpfkI2U) – Das Video erklärt ausführlich, wie Gatherers funktionieren und wie man eigene schreiben kann.
