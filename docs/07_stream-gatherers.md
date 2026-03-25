@@ -1,12 +1,12 @@
 # 7 · Stream Gatherers
 
-Stream Gatherers sind benutzerdefinierte Zwischenoperationen für Streams. Sie schliessen die Lücke zwischen eingebauten Operationen (`map`, `filter`) und dem Terminal-Collector. Während Collectors das **Ende** einer Pipeline definieren, erweitern Gatherers die **Mitte** – dort, wo bisher nur die fest eingebauten Operationen zur Verfügung standen.
+Mit Gatherers lassen sich eigene Zwischenoperationen für Streams schreiben. Bisher konnte man nur am **Ende** einer Pipeline eigene Logik einbauen (via Collectors) – die **Mitte** war auf die eingebauten Operationen wie `map`, `filter` oder `flatMap` beschränkt. Gatherers schliessen genau diese Lücke.
 
-### Eingebaute Gatherers
+## Eingebaute Gatherers
 
 Java stellt in der Klasse `java.util.stream.Gatherers` fünf vorgefertigte Gatherer bereit:
 
-#### `windowFixed(int size)` – Feste Fenster (nicht überlappend)
+### `windowFixed(int size)` – Feste Fenster (nicht überlappend)
 
 Teilt den Stream in aufeinanderfolgende, nicht überlappende Listen fester Grösse auf. Ist das letzte Fenster kleiner als `size`, wird es trotzdem ausgegeben.
 
@@ -16,7 +16,7 @@ Stream.of(1, 2, 3, 4, 5, 6, 7)
     .toList();  // [[1, 2, 3], [4, 5, 6], [7]]
 ```
 
-#### `windowSliding(int size)` – Gleitende Fenster (überlappend)
+### `windowSliding(int size)` – Gleitende Fenster (überlappend)
 
 Erzeugt überlappende Fenster, wobei jedes Fenster um ein Element versetzt startet. Nützlich für gleitende Durchschnitte oder Nachbar-Vergleiche.
 
@@ -32,7 +32,7 @@ Stream.of(10.0, 20.0, 30.0, 40.0, 50.0)
     .toList();  // [20.0, 30.0, 40.0]
 ```
 
-#### `scan(Supplier<R> initial, BiFunction<R, T, R> scanner)` – Laufende Akkumulation
+### `scan(Supplier<R> initial, BiFunction<R, T, R> scanner)` – Laufende Akkumulation
 
 Funktioniert ähnlich wie die Terminal-Operation `Stream.reduce()`, gibt aber **jeden Zwischenwert** als Element in den Stream aus – nicht nur das Endergebnis. Ideal für laufende Summen, Zustandsmaschinen usw.
 
@@ -53,7 +53,7 @@ Stream.of("a", "b", "c", "d")
     .toList();  // ["a", "ab", "abc", "abcd"]
 ```
 
-#### `fold(Supplier<R> initial, BiFunction<R, T, R> folder)` – Reduktion auf einen Wert
+### `fold(Supplier<R> initial, BiFunction<R, T, R> folder)` – Reduktion auf einen Wert
 
 Ähnlich wie `scan`, gibt aber nur das **Endergebnis** aus (ein einzelnes Element). Unterschied zu `reduce`: `fold` erlaubt einen anderen Ergebnistyp als den Elementtyp.
 
@@ -69,7 +69,7 @@ Stream.of("a", "b", "c")
     .toList();  // [3]
 ```
 
-#### `mapConcurrent(int maxConcurrency, Function<T, R> mapper)` – Parallele Verarbeitung
+### `mapConcurrent(int maxConcurrency, Function<T, R> mapper)` – Parallele Verarbeitung
 
 Führt die Mapping-Funktion parallel auf virtuellen Threads aus, begrenzt auf `maxConcurrency` gleichzeitige Aufrufe. Perfekt für I/O-lastige Operationen. Der Stream muss **sequentiell** sein.
 
@@ -87,7 +87,7 @@ userIds.stream()
     .toList();
 ```
 
-### Gatherer verketten
+## Gatherer verketten
 
 Gatherer lassen sich mit `andThen` kombinieren – genau wie Streams mit mehreren `.gather()`-Aufrufen:
 
@@ -112,7 +112,7 @@ Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 ---
 
-### Eigene Gatherer erstellen
+## Eigene Gatherer erstellen
 
 Ein Gatherer besteht aus bis zu vier Komponenten:
 
@@ -136,7 +136,7 @@ Gatherer.of(initializer, integrator, combiner, finisher); // parallelisierbar
 | **Combiner**    | `BinaryOperator<A>`                                | Kombiniert Zustände bei paralleler Verarbeitung       |
 | **Finisher**    | `BiConsumer<A, Gatherer.Downstream<? super R>>`    | Wird am Ende aufgerufen; kann letzte Elemente ausgeben|
 
-#### Der Integrator im Detail
+### Der Integrator im Detail
 
 Der Integrator ist das Herzstück. Er erhält drei Parameter und gibt einen `boolean` zurück:
 
@@ -153,7 +153,7 @@ Der Integrator ist das Herzstück. Er erhält drei Parameter und gibt einen `boo
 }
 ```
 
-#### Beispiel 1: Nur jedes n-te Element
+### Beispiel 1: Nur jedes n-te Element
 
 ```java
 static <T> Gatherer<T, ?, T> everyNth(int n) {
@@ -173,7 +173,7 @@ Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9)
     .toList();  // [1, 4, 7]
 ```
 
-#### Beispiel 2: Distinct By – Deduplizierung nach Schlüssel
+### Beispiel 2: Distinct By – Deduplizierung nach Schlüssel
 
 ```java
 static <T, K> Gatherer<T, ?, T> distinctBy(Function<T, K> keyExtractor) {
@@ -200,7 +200,7 @@ Stream.of(
     .toList();  // [Anna/Bern, Beat/Zürich, Dani/Basel]
 ```
 
-#### Beispiel 3: Mit Finisher – Gruppierung in Batches mit Rest
+### Beispiel 3: Mit Finisher – Gruppierung in Batches mit Rest
 
 ```java
 static <T> Gatherer<T, ?, List<T>> batch(int size) {
@@ -228,7 +228,7 @@ Stream.of(1, 2, 3, 4, 5, 6, 7)
     .toList();  // [[1, 2, 3], [4, 5, 6], [7]]
 ```
 
-#### Beispiel 4: Short-Circuiting – Stream vorzeitig beenden
+### Beispiel 4: Short-Circuiting – Stream vorzeitig beenden
 
 Wenn der Integrator `false` zurückgibt, wird der Stream sofort beendet:
 
@@ -252,7 +252,7 @@ Stream.of(2, 4, 6, 7, 8, 10)
     .toList();  // [2, 4, 6]
 ```
 
-#### Beispiel 5: Zustandsbehaftete Transformation – Differenz zum Vorgänger
+### Beispiel 5: Zustandsbehaftete Transformation – Differenz zum Vorgänger
 
 ```java
 static Gatherer<Integer, ?, Integer> deltas() {
@@ -273,7 +273,7 @@ Stream.of(10, 13, 17, 20, 28)
     .toList();  // [3, 4, 3, 8]
 ```
 
-### Vergleich: Gatherer vs. Collector
+## Vergleich: Gatherer vs. Collector
 
 | Eigenschaft             | Gatherer (Zwischenoperation)       | Collector (Terminaloperation)     |
 |-------------------------|------------------------------------|-----------------------------------|
@@ -285,6 +285,6 @@ Stream.of(10, 13, 17, 20, 28)
 
 ---
 
-### Weiterführendes Material
+## Weiterführendes Material
 
 - [Stream Gatherers erklärt (YouTube)](https://www.youtube.com/watch?v=v_5SKpfkI2U) – Das Video erklärt ausführlich, wie Gatherers funktionieren und wie man eigene schreiben kann.

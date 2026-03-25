@@ -1,4 +1,4 @@
-# 0 · Vereinfachte Main-Methoden & IO
+# 0 · Vereinfachte Main-Methoden, IO & Sequenced Collections
 
 ## Vereinfachte Main-Methoden
 
@@ -142,9 +142,9 @@ Kein `public class`, kein `static`, kein `String[] args`, kein `System.out`, kei
 
 ---
 
-## Sequenced Collections
+## Sequenced Collections (seit Java 21)
 
-Sequenced Collections fügen eine einheitliche API für Collections mit definierter Reihenfolge hinzu. Erstes/letztes Element und umgekehrte Iteration sind jetzt standardisiert.
+Sequenced Collections bringen eine einheitliche API für Collections mit definierter Reihenfolge. Erstes/letztes Element und umgekehrte Iteration sind damit endlich standardisiert – egal ob `List`, `Deque` oder `LinkedHashSet`.
 
 ### Neue Interface-Hierarchie
 
