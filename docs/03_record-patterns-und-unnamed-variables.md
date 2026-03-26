@@ -2,7 +2,7 @@
 
 ## Record Patterns
 
-Record Patterns ermöglichen das Dekonstruieren von Records direkt im Pattern Matching – ohne manuelle Getter-Aufrufe.
+Record Patterns ermöglichen das **Dekonstruieren** von Records direkt im Pattern Matching – ohne manuelle Getter-Aufrufe.
 
 ### Grundlagen
 
