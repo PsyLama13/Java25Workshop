@@ -7,17 +7,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Aufgaben:
- * - loadDashboard(): Refaktoriere zu Structured Concurrency mit ShutdownOnFailure.
+ * - loadDashboard(): Refaktoriere zu Structured Concurrency mit Joiner.awaitAllSuccessfulOrThrow().
  *   Wenn ein Task fehlschlägt, sollen alle anderen abgebrochen werden.
- * - fetchFastest(): Refaktoriere zu Structured Concurrency mit ShutdownOnSuccess.
+ * - fetchFastest(): Refaktoriere zu Structured Concurrency mit Joiner.anySuccessfulResultOrThrow().
  *   Wir wollen das Ergebnis des schnellsten Servers.
  *   Sobald einer antwortet, sollen die anderen abgebrochen werden.
  *
  * Hinweise:
- * - StructuredTaskScope.ShutdownOnFailure: Bricht alle ab wenn einer fehlschlägt
- * - StructuredTaskScope.ShutdownOnSuccess: Nimmt das erste erfolgreiche Ergebnis
+ * - StructuredTaskScope.open(Joiner.awaitAllSuccessfulOrThrow()): Bricht alle ab wenn einer fehlschlägt
+ * - StructuredTaskScope.open(Joiner.anySuccessfulResultOrThrow()): Nimmt das erste erfolgreiche Ergebnis
  * - scope.fork(() -> ...) für parallele Tasks
- * - scope.join() wartet auf alle Tasks
+ * - scope.join() wartet auf alle Tasks (und liefert bei anySuccessfulResultOrThrow direkt das Ergebnis)
  * - Preview-Feature (--enable-preview)
  */
 @DisplayName("Übung 5.2: Structured Concurrency")

@@ -73,16 +73,15 @@ Typische Probleme:
 3. **Close** – beim Schliessen (try-with-resources) werden alle Tasks garantiert beendet
 
 ```java
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+try (var scope = StructuredTaskScope.open(Joiner.awaitAllSuccessfulOrThrow())) {
     // 1. Fork: Tasks starten (laufen auf Virtual Threads)
     Subtask<String> user   = scope.fork(() -> fetchUser(userId));
     Subtask<String> orders = scope.fork(() -> fetchOrders(userId));
 
-    // 2. Join: Warten bis alle Tasks fertig sind
+    // 2. Join: Warten bis alle Tasks fertig sind (wirft Exception wenn ein Task fehlschlug)
     scope.join();
 
     // 3. Ergebnisse verwenden
-    scope.throwIfFailed();  // wirft Exception wenn ein Task fehlschlug
     return new Dashboard(user.get(), orders.get());
 }  // 4. Close: garantiert, dass alle Threads beendet sind
 ```
@@ -101,18 +100,17 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 
 > `Subtask.get()` darf erst **nach** `scope.join()` aufgerufen werden. Vorher wirft es eine `IllegalStateException`.
 
-### ShutdownOnFailure – alle oder keiner
+### awaitAllSuccessfulOrThrow – alle oder keiner
 
-Die häufigste Strategie: Alle Tasks müssen erfolgreich sein. Schlägt einer fehl, werden alle anderen sofort abgebrochen (**Shutdown**), und die Exception wird weitergegeben.
+Die häufigste Strategie: Alle Tasks müssen erfolgreich sein. Schlägt einer fehl, werden alle anderen sofort abgebrochen, und die Exception wird aus `join()` geworfen.
 
 ```java
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+try (var scope = StructuredTaskScope.open(Joiner.awaitAllSuccessfulOrThrow())) {
     Subtask<String> user   = scope.fork(() -> fetchUser(userId));
     Subtask<String> orders = scope.fork(() -> fetchOrders(userId));
     Subtask<String> recos  = scope.fork(() -> fetchRecommendations(userId));
 
-    scope.join();           // wartet auf ALLE Tasks (oder bis einer fehlschlägt)
-    scope.throwIfFailed();  // wirft die Exception des fehlgeschlagenen Tasks
+    scope.join();  // wartet auf ALLE Tasks – wirft Exception wenn einer fehlschlägt
 
     // Hier sind garantiert alle Tasks erfolgreich
     return new Dashboard(user.get(), orders.get(), recos.get());
@@ -127,41 +125,40 @@ Timeline:
   fetchOrders(...)   → ❌ Exception nach 80ms  ← löst Shutdown aus
   fetchRecos(...)    → 🛑 wird abgebrochen (interrupt)
 
-→ scope.join() kehrt sofort zurück (nicht erst nach 100ms)
-→ scope.throwIfFailed() wirft die Exception von fetchOrders
+→ scope.join() kehrt sofort zurück und wirft die Exception von fetchOrders
 ```
 
-### ShutdownOnSuccess – schnellster gewinnt
+### anySuccessfulResultOrThrow – schnellster gewinnt
 
 Startet mehrere gleichwertige Tasks und nimmt das Ergebnis des **ersten erfolgreichen**. Alle anderen werden sofort abgebrochen. Ideal für Redundanz-Szenarien.
 
 ```java
-try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
+try (var scope = StructuredTaskScope.open(Joiner.<String>anySuccessfulResultOrThrow())) {
     scope.fork(() -> fetchFromPrimary());     // 200ms
     scope.fork(() -> fetchFromSecondary());   // 100ms ← gewinnt
     scope.fork(() -> fetchFromTertiary());    // 300ms
 
-    scope.join();
-    return scope.result();  // "Daten von Secondary"
+    String result = scope.join();  // liefert direkt das Ergebnis des schnellsten Tasks
+    return result;  // "Daten von Secondary"
 }
 ```
 
 **Was passiert bei Fehlern?**
 - Schlägt ein Task fehl, laufen die anderen weiter (es wird ja auf den ersten *Erfolg* gewartet)
-- Erst wenn **alle** Tasks fehlschlagen, wirft `scope.result()` eine `ExecutionException`
+- Erst wenn **alle** Tasks fehlschlagen, wirft `join()` eine `FailedException`
 
 ### Timeout mit Deadline
 
-Beide Scope-Typen unterstützen ein Zeitlimit über `joinUntil()`:
+Ein Zeitlimit kann über die Configuration gesetzt werden:
 
 ```java
-try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+try (var scope = StructuredTaskScope.open(
+        Joiner.awaitAllSuccessfulOrThrow(),
+        cf -> cf.withTimeout(Duration.ofSeconds(5)))) {
     scope.fork(() -> fetchUser(userId));
     scope.fork(() -> fetchOrders(userId));
 
-    // Maximal 5 Sekunden warten
-    scope.joinUntil(Instant.now().plusSeconds(5));
-    scope.throwIfFailed();
+    scope.join();  // wartet maximal 5 Sekunden
 
     // ...
 }  // Tasks, die noch laufen, werden beim Close abgebrochen
@@ -172,21 +169,19 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 Scopes können verschachtelt werden – jeder innere Scope ist unabhängig vom äusseren:
 
 ```java
-try (var outer = new StructuredTaskScope.ShutdownOnFailure()) {
+try (var outer = StructuredTaskScope.open(Joiner.awaitAllSuccessfulOrThrow())) {
     outer.fork(() -> {
         // Innerer Scope – eigene Fehlerbehandlung
-        try (var inner = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
+        try (var inner = StructuredTaskScope.open(Joiner.<String>anySuccessfulResultOrThrow())) {
             inner.fork(() -> fetchFromPrimary());
             inner.fork(() -> fetchFromSecondary());
-            inner.join();
-            return inner.result();
+            return inner.join();
         }
     });
 
     outer.fork(() -> fetchOrders(userId));
 
     outer.join();
-    outer.throwIfFailed();
     // ...
 }
 ```
@@ -197,8 +192,8 @@ try (var outer = new StructuredTaskScope.ShutdownOnFailure()) {
 |-------------------------|------------------------------------------|-----------------------------------------|
 | Thread-Typ              | Platform Threads (Pool)                  | Virtual Threads (ein Thread pro Task)   |
 | Lebensdauer             | Ungebunden – muss manuell geschlossen werden | An Scope gebunden (try-with-resources)  |
-| Fehlerbehandlung        | Manuell pro Future                       | Automatisch (Shutdown-Strategien)       |
-| Abbruch bei Fehler      | Manuell implementieren                   | Automatisch (`ShutdownOnFailure`)       |
+| Fehlerbehandlung        | Manuell pro Future                       | Automatisch (Joiner-Strategien)         |
+| Abbruch bei Fehler      | Manuell implementieren                   | Automatisch (`awaitAllSuccessfulOrThrow`) |
 | Verwaiste Threads       | Möglich                                  | Unmöglich – Scope garantiert Cleanup    |
 | Thread-Hierarchie       | Flach                                    | Eltern-Kind (sichtbar in Thread-Dumps) |
 | Scoped Values           | Nicht weitergegeben                      | Automatisch an Kind-Threads vererbt    |
@@ -208,6 +203,6 @@ try (var outer = new StructuredTaskScope.ShutdownOnFailure()) {
 
 | Anwendungsfall                               | Strategie               |
 |----------------------------------------------|-------------------------|
-| Mehrere Teile eines Ergebnisses parallel laden | `ShutdownOnFailure`    |
-| Redundante Quellen – schnellste Antwort nehmen | `ShutdownOnSuccess`   |
-| Parallele Tasks mit Zeitlimit                 | `joinUntil(deadline)`  |
+| Mehrere Teile eines Ergebnisses parallel laden | `Joiner.awaitAllSuccessfulOrThrow()` |
+| Redundante Quellen – schnellste Antwort nehmen | `Joiner.anySuccessfulResultOrThrow()` |
+| Parallele Tasks mit Zeitlimit                 | `cf -> cf.withTimeout(duration)`     |
