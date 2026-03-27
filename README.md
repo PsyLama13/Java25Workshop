@@ -80,7 +80,8 @@ Der Build muss **erfolgreich** durchlaufen. Falls Fehler auftreten, prüfe:
 mvn test
 ```
 
-Die Tests werden am Anfang **fehlschlagen** – das ist gewollt! Die Übungen bestehen darin, den Code so umzuschreiben, dass die Tests grün werden.
+Die Tests werden am Anfang ~~**fehlschlagen** – das ist gewollt! Die Übungen bestehen darin, den Code so umzuschreiben, dass die Tests grün werden.~~
+Die Tests werden **korrekt durchlaufen**. Sie sind mit "altem" JAva Code geschrieben, aber sie sollten sowohl mit dem alten wie auch mit dem neuen Java25 Code durchlaufen.
 
 ---
 
